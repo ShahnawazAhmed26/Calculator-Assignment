@@ -95,31 +95,44 @@ class _SpeedConverterState extends State<SpeedConverter> {
         backgroundColor: Colors.black,
         actions: [
           IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
         ],
       ),
+      backgroundColor: Colors.black, // Set background color to black
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text('Enter speed:', style: TextStyle(fontSize: 20, color: Colors.white)),
             SizedBox(height: 10),
-            TextField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Speed',
-                hintStyle: TextStyle(color: Colors.grey),
-                filled: true,
-                fillColor: Colors.grey[850],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.grey[900],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _controller,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Speed',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                  ),
                 ),
               ),
             ),
@@ -146,9 +159,19 @@ class _SpeedConverterState extends State<SpeedConverter> {
               ),
             ),
             SizedBox(height: 20),
-            Text(
-              'Converted Speed: $_convertedSpeed $_selectedToUnit',
-              style: TextStyle(fontSize: 18, color: Colors.white),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.grey[900],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Converted Speed: $_convertedSpeed $_selectedToUnit',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
             ),
           ],
         ),
@@ -161,17 +184,27 @@ class _SpeedConverterState extends State<SpeedConverter> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: TextStyle(fontSize: 20, color: Colors.white)),
-        DropdownButton<String>(
-          value: value,
-          onChanged: onChanged,
-          items: _units.map((unit) {
-            return DropdownMenuItem(
-              value: unit,
-              child: Text(unit, style: TextStyle(color: Colors.white)),
-            );
-          }).toList(),
-          dropdownColor: Colors.grey[850],
-          isExpanded: true,
+        Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          color: Colors.grey[900],
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: DropdownButton<String>(
+              value: value,
+              onChanged: onChanged,
+              items: _units.map((unit) {
+                return DropdownMenuItem(
+                  value: unit,
+                  child: Text(unit, style: TextStyle(color: Colors.white)),
+                );
+              }).toList(),
+              dropdownColor: Colors.grey[850],
+              isExpanded: true,
+            ),
+          ),
         ),
       ],
     );

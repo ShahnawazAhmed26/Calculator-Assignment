@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:expressions/expressions.dart';
-import 'currency_convertor.dart'; // Import the currency converter screen
+import 'currency_converter.dart'; // Import the currency converter screen
 import 'conversion_selector.dart'; // Import the conversions selector screen
 
 
@@ -34,15 +34,7 @@ class _CalculatorState extends State<Calculator> {
             icon: Icon(Icons.history),
             onPressed: showHistory,
           ),
-          IconButton(
-            icon: Icon(Icons.attach_money),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CurrencyConverter()),
-              );
-            },
-          ),
+         
           IconButton(
             icon: Icon(Icons.swap_horiz),
             onPressed: () {

@@ -1,5 +1,5 @@
 
-import 'package:babaproject/calculator.dart';
+import 'calculator.dart';
 import 'package:flutter/material.dart';
 
 void main() {
