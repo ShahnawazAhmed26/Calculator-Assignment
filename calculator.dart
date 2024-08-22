@@ -3,7 +3,6 @@ import 'package:expressions/expressions.dart';
 import 'currency_converter.dart'; // Import the currency converter screen
 import 'conversion_selector.dart'; // Import the conversions selector screen
 
-
 class Calculator extends StatefulWidget {
   const Calculator({super.key});
 
@@ -11,17 +10,40 @@ class Calculator extends StatefulWidget {
   State<Calculator> createState() => _CalculatorState();
 }
 
-class _CalculatorState extends State<Calculator> {
+class _CalculatorState extends State<Calculator> with SingleTickerProviderStateMixin {
   String display = '0';
   String expression = '';
-  
   List<String> history = [];
+  bool isScientific = false; // This toggles between standard and scientific calculator
+  bool showHistoryButton = true; // Controls which button to show
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: const Text(
           "CALCULATOR",
           style: TextStyle(
@@ -29,88 +51,203 @@ class _CalculatorState extends State<Calculator> {
             color: Colors.white,
           ),
         ),
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: Icon(Icons.menu), // Slider icon on the left
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Open the drawer when pressed
+              },
+            );
+          },
+        ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.history),
-            onPressed: showHistory,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: showHistoryButton
+                ? ScaleTransition(
+                    scale: _animation,
+                    child: IconButton(
+                      key: ValueKey('history'),
+                      icon: Icon(Icons.history),
+                      onPressed: () {
+                        setState(() {
+                          showHistoryButton = !showHistoryButton;
+                          _animationController.forward().then((_) {
+                            _animationController.reverse();
+                          });
+                        });
+                        showHistory();
+                      },
+                    ),
+                  )
+                : ScaleTransition(
+                    scale: _animation,
+                    child: IconButton(
+                      key: ValueKey('converters'),
+                      icon: Icon(Icons.swap_horiz),
+                      onPressed: () {
+                        setState(() {
+                          showHistoryButton = !showHistoryButton;
+                          _animationController.forward().then((_) {
+                            _animationController.reverse();
+                          });
+                        });
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ConversionsSelector()),
+                        );
+                      },
+                    ),
+                  ),
           ),
-         
           IconButton(
-            icon: Icon(Icons.swap_horiz),
+            icon: Icon(Icons.currency_exchange), // Add the most right icon
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ConversionsSelector()),
+                MaterialPageRoute(builder: (context) => CurrencyConverter()),
               );
             },
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 5),
+      drawer: Drawer(
+        backgroundColor: Colors.grey[900],
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            // Display area
-            Container(
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              child: Text(
-                display,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: _getFontSize(display),
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.black),
+              child: Center(
+                child: Text(
+                  "Calculator Modes",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                textAlign: TextAlign.right,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Calculator buttons
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: _buttonLabels.length,
-                itemBuilder: (context, index) {
-                  final button = _buttonLabels[index];
-                  final isOperator = ['/', '*', '-', '+', '=', '⌫'].contains(button);
-                  return ElevatedButton(
-                    onPressed: () {
-                      calculation(button);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isOperator ? Colors.yellow : Colors.grey[850],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: EdgeInsets.all(20),
-                    ),
-                    child: Text(
-                      button,
-                      style: TextStyle(
-                        fontSize: 30,
-                        color: isOperator ? Colors.black : Colors.white,
-                      ),
-                    ),
-                  );
-                },
+            ListTile(
+              title: const Text(
+                "Standard",
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
+              onTap: () {
+                setState(() {
+                  isScientific = false;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text(
+                "Scientific",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              onTap: () {
+                setState(() {
+                  isScientific = true;
+                });
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
       ),
+      body: Column(
+        children: <Widget>[
+          // Display area
+          Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            child: Text(
+              display,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: _getFontSize(display),
+              ),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          // Calculator buttons
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 6, // Adjusts the height of the button grid
+                  child: Column(
+                    children: _buildButtonRows(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  List<Widget> _buildButtonRows() {
+    final buttonLabels = isScientific ? _scientificButtonLabels : _buttonLabels;
+    List<Widget> rows = [];
+    for (int i = 0; i < buttonLabels.length; i += 4) {
+      rows.add(
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: buttonLabels.sublist(i, i + 4).map((button) {
+              final isOperator = ['÷', '*', '-', '+', '=', '⌫'].contains(button);
+              return Flexible(
+                flex: 1,
+                child: ElevatedButton(
+                  onPressed: () {
+                    calculation(button);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isOperator
+                        ? Colors.yellow
+                        : Colors.grey[850],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.all(20),
+                  ),
+                  child: Text(
+                    button,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: isOperator ? Colors.black : Colors.white,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      );
+    }
+    return rows;
   }
 
   final List<String> _buttonLabels = [
     'AC', '+/-', '%', '⌫',
-    '7', '8', '9', '/',
+    '7', '8', '9', '÷',
     '4', '5', '6', '*',
     '1', '2', '3', '-',
     '0', '.', '=', '+'
+  ];
+
+  final List<String> _scientificButtonLabels = [
+    'AC', '+/-', '%', '⌫',
+    '7', '8', '9', '÷',
+    '4', '5', '6', '*',
+    '1', '2', '3', '-',
+    '0', '.', '=', '+',
+    'sin', 'cos', 'tan', '√',
+    'ln', 'log', 'e', 'π'
   ];
 
   double _getFontSize(String text) {
@@ -125,20 +262,23 @@ class _CalculatorState extends State<Calculator> {
         display = '0';
         expression = '';
       } else if (buttonText == '+/-') {
-        if (expression.isNotEmpty) {
-          if (expression[0] == '-') {
-            expression = expression.substring(1);
+        if (display != '0') {
+          if (display.startsWith('-')) {
+            display = display.substring(1);
           } else {
-            expression = '-' + expression;
+            display = '-' + display;
           }
+          expression = display;
         }
       } else if (buttonText == '%') {
-        if (expression.isNotEmpty) {
-          expression = (double.parse(expression) / 100).toString();
+        if (display != '0' && display.isNotEmpty) {
+          double currentValue = double.tryParse(display) ?? 0;
+          display = (currentValue / 100).toString();
+          expression = display;
         }
       } else if (buttonText == '=') {
         try {
-          final parsedExpression = Expression.parse(expression);
+          final parsedExpression = Expression.parse(expression.replaceAll('÷', '/'));
           final evaluator = const ExpressionEvaluator();
           final result = evaluator.eval(parsedExpression, {});
           display = result.toString();
@@ -148,11 +288,11 @@ class _CalculatorState extends State<Calculator> {
           display = 'Error';
           expression = '';
         }
-      } else if (buttonText == '⌫') { // Backspace button
+      } else if (buttonText == '⌫') {
         if (display.isNotEmpty) {
           display = display.substring(0, display.length - 1);
           if (display.isEmpty) display = '0';
-          expression = display.replaceAll('x', '*').replaceAll('/', '/');
+          expression = display.replaceAll('x', '*').replaceAll('÷', '/');
         }
       } else {
         if (display == '0') {
@@ -160,7 +300,7 @@ class _CalculatorState extends State<Calculator> {
         } else {
           display += buttonText;
         }
-        expression = display.replaceAll('x', '*').replaceAll('/', '/');
+        expression = display.replaceAll('x', '*').replaceAll('÷', '/');
       }
     });
   }
