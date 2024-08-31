@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:expressions/expressions.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
 import 'conversion_selector.dart'; // Import the conversions selector screen
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:expressions/expressions.dart';
+
 
 class Calculator extends StatefulWidget {
   const Calculator({super.key});
@@ -12,14 +16,26 @@ class Calculator extends StatefulWidget {
 class _CalculatorState extends State<Calculator> {
   String display = '0';
   String expression = '';
-  List<String> history = [];
-  bool showHistoryButton = true; // Controls which button to show
+  List<String> history = []; // Initialize history as an empty list
+
+  final List<String> _buttonLabels = [
+    'AC', '+/-', '%', '⌫',
+    '7', '8', '9', '/',
+    '4', '5', '6', '*',
+    '1', '2', '3', '-',
+    '0', '.', '=', '+'
+  ];
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width and height
+    final screenSize = MediaQuery.of(context).size;
+    final buttonSize = screenSize.width / 4; // Calculate button size based on screen width
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: const Text(
           "CALCULATOR",
           style: TextStyle(
@@ -30,7 +46,11 @@ class _CalculatorState extends State<Calculator> {
         leading: Builder(
           builder: (context) {
             return IconButton(
-              icon: Icon(Icons.menu), // Slider icon on the left
+              icon: CachedNetworkImage(
+                imageUrl: 'https://imgtr.ee/images/2024/08/31/a30eba82aec52b735ec6360a0d8730a4.png',
+                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
               onPressed: () {
                 Scaffold.of(context).openDrawer(); // Open the drawer when pressed
               },
@@ -40,13 +60,25 @@ class _CalculatorState extends State<Calculator> {
         actions: [
           IconButton(
             key: ValueKey('history'),
-            icon: Icon(Icons.history),
+            icon: CachedNetworkImage(
+              imageUrl: 'https://imgtr.ee/images/2024/08/31/5bf8f37eaf4259844428731b2f80ae47.png',
+              width: 24,
+              height: 24,
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
             onPressed: () {
               showHistory();
             },
           ),
           IconButton(
-            icon: Icon(Icons.transform), // Better icon for conversions selector
+            icon: CachedNetworkImage(
+              imageUrl: 'https://imgtr.ee/images/2024/08/31/640305d68702aa1036b8787ecca5ae6d.png',
+              width: 24,
+              height: 24,
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -82,6 +114,14 @@ class _CalculatorState extends State<Calculator> {
                 Navigator.pop(context);
               },
             ),
+            ListTile(
+              leading: Icon(Icons.star, color: Colors.yellow),
+              title: Text(
+                "Rate Us",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              onTap: _rateUs,
+            ),
           ],
         ),
       ),
@@ -103,125 +143,48 @@ class _CalculatorState extends State<Calculator> {
           ),
           // Calculator buttons
           Expanded(
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 6, // Adjusts the height of the button grid
-                  child: Column(
-                    children: _buildButtonRows(),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4, // Number of buttons per row
+                crossAxisSpacing: 2, // Adjust spacing between buttons
+                mainAxisSpacing: 2, // Adjust spacing between rows
+                childAspectRatio: 1.0, // Ensures buttons are square
+              ),
+              itemCount: _buttonLabels.length,
+              itemBuilder: (context, index) {
+                final button = _buttonLabels[index];
+                final isOperator = ['/', '*', '-', '+', '=', '⌫'].contains(button);
+                return SizedBox(
+                  width: buttonSize,
+                  height: buttonSize,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      calculation(button);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isOperator ? Colors.yellow : Colors.grey[850],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.all(0), // Remove additional padding
+                    ),
+                    child: Center(
+                      child: Text(
+                        button,
+                        style: TextStyle(
+                          fontSize: 20, // Adjust font size as needed
+                          color: isOperator ? Colors.black : Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
       ),
     );
-  }
-
-  List<Widget> _buildButtonRows() {
-    final buttonLabels = _buttonLabels;
-    List<Widget> rows = [];
-    for (int i = 0; i < buttonLabels.length; i += 4) {
-      rows.add(
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: buttonLabels.sublist(i, i + 4).map((button) {
-              final isOperator = ['/', '*', '-', '+', '=', '⌫'].contains(button);
-              return Flexible(
-                flex: 1,
-                child: ElevatedButton(
-                  onPressed: () {
-                    calculation(button);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isOperator
-                        ? Colors.yellow
-                        : Colors.grey[850],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(20),
-                  ),
-                  child: Text(
-                    button,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: isOperator ? Colors.black : Colors.white,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      );
-    }
-    return rows;
-  }
-
-  final List<String> _buttonLabels = [
-    'AC', '+/-', '%', '⌫',
-    '7', '8', '9', '/',
-    '4', '5', '6', '*',
-    '1', '2', '3', '-',
-    '0', '.', '=', '+'
-  ];
-
-  double _getFontSize(String text) {
-    if (text.length > 15) return 40; // Smaller font size for longer text
-    if (text.length > 10) return 50; // Medium font size
-    return 60; // Larger font size for shorter text
-  }
-
-  void calculation(String buttonText) {
-    setState(() {
-      if (buttonText == 'AC') {
-        display = '0';
-        expression = '';
-      } else if (buttonText == '+/-') {
-        if (display != '0') {
-          if (display.startsWith('-')) {
-            display = display.substring(1);
-          } else {
-            display = '-' + display;
-          }
-          expression = display;
-        }
-      } else if (buttonText == '%') {
-        if (display != '0' && display.isNotEmpty) {
-          double currentValue = double.tryParse(display) ?? 0;
-          display = (currentValue / 100).toString();
-          expression = display;
-        }
-      } else if (buttonText == '=') {
-        try {
-          final parsedExpression = Expression.parse(expression);
-          final evaluator = const ExpressionEvaluator();
-          final result = evaluator.eval(parsedExpression, {});
-          display = result.toString();
-          history.add('$expression = $display');
-          expression = display;
-        } catch (e) {
-          display = 'Error';
-          expression = '';
-        }
-      } else if (buttonText == '⌫') {
-        if (display.isNotEmpty) {
-          display = display.substring(0, display.length - 1);
-          if (display.isEmpty) display = '0';
-          expression = display.replaceAll('x', '*').replaceAll('/', '/');
-        }
-      } else {
-        if (display == '0') {
-          display = buttonText;
-        } else {
-          display += buttonText;
-        }
-        expression = display.replaceAll('x', '*').replaceAll('/', '/');
-      }
-    });
   }
 
   void showHistory() {
@@ -282,19 +245,37 @@ class _CalculatorState extends State<Calculator> {
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Button color
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          history.clear(); // Clear the history
+                        });
+                        Navigator.of(context).pop(); // Close the bottom sheet
+                      },
+                      child: Text(
+                        'Clear All History',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Close',
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.yellow, // Button color
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the bottom sheet
+                      },
+                      child: Text(
+                        'Close',
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -302,5 +283,99 @@ class _CalculatorState extends State<Calculator> {
         );
       },
     );
+  }
+
+  double _getFontSize(String text) {
+    if (text.length > 15) return 40; // Smaller font size for longer text
+    if (text.length > 10) return 50; // Medium font size
+    return 60; // Larger font size for shorter text
+  }
+
+  void calculation(String buttonText) {
+  setState(() {
+    if (buttonText == null) {
+      print('Error: buttonText is null');
+      return;
+    }
+
+    print('Button Pressed: $buttonText');
+    print('Current Display: $display');
+    print('Current Expression: $expression');
+
+    if (buttonText == 'AC') {
+      display = '0';
+      expression = '';
+    } else if (buttonText == '+/-') {
+      // Toggle the sign of the display value
+      if (display != '0') {
+        if (display.startsWith('-')) {
+          display = display.substring(1);
+        } else {
+          display = '-' + display;
+        }
+        expression = display;
+      }
+    } else if (buttonText == '%') {
+      // Calculate percentage based on the current expression
+      if (display.isNotEmpty) {
+        try {
+          double currentValue = double.tryParse(display) ?? 0;
+          if (expression.isNotEmpty) {
+            final parsedExpression = Expression.parse(expression.replaceAll('x', '*').replaceAll('÷', '/'));
+            final evaluator = const ExpressionEvaluator();
+            final result = evaluator.eval(parsedExpression, {});
+            display = (result * currentValue / 100).toString();
+          } else {
+            display = (currentValue / 100).toString();
+          }
+          expression = display;
+        } catch (e) {
+          display = 'Error';
+        }
+      }
+    } else if (buttonText == '=') {
+      // Evaluate the expression
+      if (expression.isNotEmpty) {
+        try {
+          final parsedExpression = Expression.parse(expression.replaceAll('x', '*').replaceAll('÷', '/'));
+          final evaluator = const ExpressionEvaluator();
+          final result = evaluator.eval(parsedExpression, {});
+          display = result.toString();
+          history.add('$expression = $display'); // Add to history
+          expression = ''; // Clear the expression after evaluation
+        } catch (e) {
+          display = 'Error';
+        }
+      }
+    } else if (buttonText == '⌫') {
+      // Handle backspace
+      if (display.length > 1) {
+        display = display.substring(0, display.length - 1);
+      } else {
+        display = '0';
+      }
+      expression = display;
+    } else {
+      // Append the button text to the display and expression
+      if (display == '0' && buttonText != '.') {
+        display = buttonText;
+      } else {
+        display += buttonText;
+      }
+      expression += buttonText;
+    }
+
+    print('Updated Display: $display');
+    print('Updated Expression: $expression');
+  });
+}
+
+  void _rateUs() async {
+    const url = 'https://play.google.com/store/apps/details?id=com.example.app'; // Update with your app's URL
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
