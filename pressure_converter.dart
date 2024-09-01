@@ -29,11 +29,8 @@ class _PressureConverterState extends State<PressureConverter> {
     double convertedValue = (_inputValue * fromRate) / toRate;
 
     setState(() {
-      _result = 'Conversion Result:\n\n'
-                '${_inputValue.toStringAsPrecision(6)} $_fromUnit\n'
-                '=\n'
-                '${convertedValue.toStringAsPrecision(6)} $_toUnit\n\n'
-                'Note: Conversion is based on predefined rates.';
+      _result = 'Conversion Result:\n\n ${convertedValue.toStringAsPrecision(6)} $_toUnit\n\n';
+            
     });
   }
 
@@ -45,33 +42,35 @@ class _PressureConverterState extends State<PressureConverter> {
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTitle('From:'),
-            SizedBox(height: 10),
-            _buildCustomDropdown(_fromUnit, (value) {
-              setState(() {
-                _fromUnit = value!;
-              });
-            }),
-            SizedBox(height: 20),
-            _buildInputField(),
-            SizedBox(height: 20),
-            _buildTitle('To:'),
-            SizedBox(height: 10),
-            _buildCustomDropdown(_toUnit, (value) {
-              setState(() {
-                _toUnit = value!;
-              });
-            }),
-            SizedBox(height: 20),
-            _buildConvertButton(),
-            SizedBox(height: 20),
-            _buildResultCard(),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTitle('From:'),
+              SizedBox(height: 10),
+              _buildCustomDropdown(_fromUnit, (value) {
+                setState(() {
+                  _fromUnit = value!;
+                });
+              }),
+              SizedBox(height: 20),
+              _buildInputField(),
+              SizedBox(height: 20),
+              _buildTitle('To:'),
+              SizedBox(height: 10),
+              _buildCustomDropdown(_toUnit, (value) {
+                setState(() {
+                  _toUnit = value!;
+                });
+              }),
+              SizedBox(height: 20),
+              _buildConvertButton(),
+              SizedBox(height: 20),
+              _buildResultCard(),
+            ],
+          ),
         ),
       ),
     );

@@ -26,15 +26,38 @@ class _EnergyConverterState extends State<EnergyConverter> {
     'Kilowatt-hours': 3600000.0,    // Conversion factor for energy
   };
 
-  void _convertEnergy() {
-    double fromRate = _conversionRates[_fromUnit]!;
-    double toRate = _conversionRates[_toUnit]!;
-    double convertedValue = (_inputValue * fromRate) / toRate;
+void _convertEnergy() {
+  double fromRate = _conversionRates[_fromUnit] ?? 1.0;
+  double toRate = _conversionRates[_toUnit] ?? 1.0;
+  double convertedValue = (_inputValue * fromRate) / toRate;
 
-    setState(() {
-      _result = 'Converted value: ${convertedValue.toStringAsFixed(4)} $_toUnit'; // Adjusted for precision
-    });
-  }
+  setState(() {
+    _result = 'Converted Energy: ${convertedValue.toStringAsFixed(4)} $_toUnit'; // Adjusted for precision
+  });
+}
+Widget _buildResultText() {
+  return Center(
+    child: Card(
+      color: Colors.grey[850],
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.038),
+        child: Text(
+          _result, // Use the result stored in _convertEnergy
+          style: TextStyle(
+            fontSize: MediaQuery.of(context).size.width * 0.05,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

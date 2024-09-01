@@ -179,10 +179,24 @@ class _TemperatureConverterState extends State<TemperatureConverter> {
     );
   }
 
+
   Widget _buildResultText() {
-    return Text(
-      'Converted Temperature: $_convertedTemperature $_selectedToUnit',
-      style: TextStyle(fontSize: 18, color: Colors.white),
+    return Center(
+      child: Card(
+        color: Colors.grey[850],
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.038),
+          child: Text(
+            'Converted Temprature: $_convertedTemperature $_selectedToUnit',
+            style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -27,10 +27,8 @@ class _PowerConverterState extends State<PowerConverter> {
 
     setState(() {
       _result = 'Conversion Result:\n\n'
-                '${_inputValue.toStringAsPrecision(6)} $_fromUnit\n'
-                '=\n'
                 '${convertedValue.toStringAsPrecision(6)} $_toUnit\n\n'
-                'Note: Conversion is based on predefined rates.';
+                ;
     });
   }
 
@@ -42,33 +40,35 @@ class _PowerConverterState extends State<PowerConverter> {
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTitle('From:'),
-            SizedBox(height: 10),
-            _buildCustomDropdown(_fromUnit, (value) {
-              setState(() {
-                _fromUnit = value!;
-              });
-            }),
-            SizedBox(height: 20),
-            _buildInputField(),
-            SizedBox(height: 20),
-            _buildTitle('To:'),
-            SizedBox(height: 10),
-            _buildCustomDropdown(_toUnit, (value) {
-              setState(() {
-                _toUnit = value!;
-              });
-            }),
-            SizedBox(height: 20),
-            _buildConvertButton(),
-            SizedBox(height: 20),
-            _buildResultCard(),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTitle('From:'),
+              SizedBox(height: 10),
+              _buildCustomDropdown(_fromUnit, (value) {
+                setState(() {
+                  _fromUnit = value!;
+                });
+              }),
+              SizedBox(height: 20),
+              _buildInputField(),
+              SizedBox(height: 20),
+              _buildTitle('To:'),
+              SizedBox(height: 10),
+              _buildCustomDropdown(_toUnit, (value) {
+                setState(() {
+                  _toUnit = value!;
+                });
+              }),
+              SizedBox(height: 20),
+              _buildConvertButton(),
+              SizedBox(height: 20),
+              _buildResultCard(),
+            ],
+          ),
         ),
       ),
     );
@@ -153,23 +153,35 @@ class _PowerConverterState extends State<PowerConverter> {
     );
   }
 
-  Widget _buildResultCard() {
-    return Center(
+Widget _buildResultCard() {
+  return Center(
+    child: Container(
+      width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+      height: MediaQuery.of(context).size.height * 0.2, // 20% of screen height
       child: Card(
         color: Colors.grey[850],
         elevation: 8,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            _result,
-            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
+        child: 
+           Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                _result.isEmpty ? 'Result will be displayed here' : _result,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
       ),
     );
-  }
+  
+}
 }

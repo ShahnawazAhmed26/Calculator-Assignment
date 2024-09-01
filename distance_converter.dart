@@ -96,31 +96,33 @@ class _DistanceConverterState extends State<DistanceConverter> {
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTitle('Enter distance:'),
-            SizedBox(height: 10),
-            _buildInputField(),
-            SizedBox(height: 20),
-            _buildCustomDropdown('From:', _selectedFromUnit, (value) {
-              setState(() {
-                _selectedFromUnit = value!;
-              });
-            }),
-            SizedBox(height: 20),
-            _buildCustomDropdown('To:', _selectedToUnit, (value) {
-              setState(() {
-                _selectedToUnit = value!;
-              });
-            }),
-            SizedBox(height: 20),
-            _buildConvertButton(),
-            SizedBox(height: 20),
-            _buildResultText(),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTitle('Enter distance:'),
+              SizedBox(height: 10),
+              _buildInputField(),
+              SizedBox(height: 20),
+              _buildCustomDropdown('From:', _selectedFromUnit, (value) {
+                setState(() {
+                  _selectedFromUnit = value!;
+                });
+              }),
+              SizedBox(height: 20),
+              _buildCustomDropdown('To:', _selectedToUnit, (value) {
+                setState(() {
+                  _selectedToUnit = value!;
+                });
+              }),
+              SizedBox(height: 20),
+              _buildConvertButton(),
+              SizedBox(height: 20),
+              _buildResultText(),
+            ],
+          ),
         ),
       ),
     );
@@ -207,11 +209,24 @@ class _DistanceConverterState extends State<DistanceConverter> {
     );
   }
 
+
   Widget _buildResultText() {
-    return Text(
-      'Converted Distance: $_convertedDistance $_selectedToUnit',
-      style: TextStyle(fontSize: 18, color: Colors.white),
-      textAlign: TextAlign.center,
+    return Center(
+      child: Card(
+        color: Colors.grey[850],
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.038),
+          child: Text(
+            'Converted Distance: $_convertedDistance $_selectedToUnit',
+            style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 }
