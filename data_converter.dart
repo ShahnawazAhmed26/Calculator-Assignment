@@ -87,15 +87,7 @@ class _DataConverterState extends State<DataConverter> {
             SizedBox(height: 20),
             _buildConvertButton(),
             SizedBox(height: 20),
-            Expanded(
-              child: Center(
-                child: Text(
-                  _result,
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
+            _buildResultCard(),
           ],
         ),
       ),
@@ -178,6 +170,26 @@ class _DataConverterState extends State<DataConverter> {
         minimumSize: Size(double.infinity, 60),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultCard() {
+    return Center(
+      child: Card(
+        color: Colors.grey[850],
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            _result,
+            style: TextStyle(fontSize: 18, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

@@ -89,31 +89,22 @@ class _SpeedConverterState extends State<SpeedConverter> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Speed Converter"),
         backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
       ),
-      backgroundColor: Colors.black, // Set background color to black
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: 16.0,
-          right: 16.0,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
-        ),
+      backgroundColor: Colors.black,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Enter speed:', style: TextStyle(fontSize: 20, color: Colors.white)),
-            SizedBox(height: 10),
+            Text('Enter speed:', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+            SizedBox(height: screenHeight * 0.02),
             Card(
               elevation: 5,
               shape: RoundedRectangleBorder(
@@ -121,7 +112,7 @@ class _SpeedConverterState extends State<SpeedConverter> {
               ),
               color: Colors.grey[900],
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(screenWidth * 0.04),
                 child: TextField(
                   controller: _controller,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -136,29 +127,29 @@ class _SpeedConverterState extends State<SpeedConverter> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             _buildDropdown('From:', _selectedFromUnit, (value) {
               setState(() {
                 _selectedFromUnit = value!;
               });
             }),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             _buildDropdown('To:', _selectedToUnit, (value) {
               setState(() {
                 _selectedToUnit = value!;
               });
             }),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             ElevatedButton(
               onPressed: _convertSpeed,
               child: Text('Convert'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.yellow,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                textStyle: TextStyle(fontSize: screenWidth * 0.05),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             Card(
               elevation: 5,
               shape: RoundedRectangleBorder(
@@ -166,10 +157,13 @@ class _SpeedConverterState extends State<SpeedConverter> {
               ),
               color: Colors.grey[900],
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Converted Speed: $_convertedSpeed $_selectedToUnit',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                padding: EdgeInsets.all(screenWidth * 0.04),
+                child: Center(
+                  child: Text(
+                    'Converted Speed: $_convertedSpeed $_selectedToUnit',
+                    style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
@@ -183,7 +177,8 @@ class _SpeedConverterState extends State<SpeedConverter> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 20, color: Colors.white)),
+        Text(label, style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05, color: Colors.white)),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         Card(
           elevation: 5,
           shape: RoundedRectangleBorder(
@@ -191,7 +186,7 @@ class _SpeedConverterState extends State<SpeedConverter> {
           ),
           color: Colors.grey[900],
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
             child: DropdownButton<String>(
               value: value,
               onChanged: onChanged,

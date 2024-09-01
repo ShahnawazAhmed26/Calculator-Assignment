@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
 import 'conversion_selector.dart'; // Import the conversions selector screen
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -89,42 +88,44 @@ class _CalculatorState extends State<Calculator> {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.grey[900],
-        child: Column(
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.black),
-              child: Center(
-                child: Text(
-                  "Calculator Modes",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+  backgroundColor: Colors.grey[900],
+  child: Column(
+    children: [
+      DrawerHeader(
+        decoration: BoxDecoration(color: Colors.black),
+        child: Center(
+          child: Text(
+            "Calculator Modes",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
-            ListTile(
-              title: const Text(
-                "Standard",
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.star, color: Colors.yellow),
-              title: Text(
-                "Rate Us",
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-              onTap: _rateUs,
-            ),
-          ],
+          ),
         ),
       ),
+      ListTile(
+        title: const Text(
+          "Standard",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+     
+      ListTile(
+        leading: Icon(Icons.star, color: Colors.yellow),
+        title: Text(
+          "Rate Us",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+        onTap: _rateUs,
+      ),
+    ],
+  ),
+),
+
       body: Column(
         children: <Widget>[
           // Display area
@@ -306,7 +307,6 @@ class _CalculatorState extends State<Calculator> {
       display = '0';
       expression = '';
     } else if (buttonText == '+/-') {
-      // Toggle the sign of the display value
       if (display != '0') {
         if (display.startsWith('-')) {
           display = display.substring(1);
@@ -316,39 +316,29 @@ class _CalculatorState extends State<Calculator> {
         expression = display;
       }
     } else if (buttonText == '%') {
-      // Calculate percentage based on the current expression
       if (display.isNotEmpty) {
         try {
           double currentValue = double.tryParse(display) ?? 0;
-          if (expression.isNotEmpty) {
-            final parsedExpression = Expression.parse(expression.replaceAll('x', '*').replaceAll('÷', '/'));
-            final evaluator = const ExpressionEvaluator();
-            final result = evaluator.eval(parsedExpression, {});
-            display = (result * currentValue / 100).toString();
-          } else {
-            display = (currentValue / 100).toString();
-          }
+          display = (currentValue / 100).toString();
           expression = display;
         } catch (e) {
           display = 'Error';
         }
       }
     } else if (buttonText == '=') {
-      // Evaluate the expression
       if (expression.isNotEmpty) {
         try {
           final parsedExpression = Expression.parse(expression.replaceAll('x', '*').replaceAll('÷', '/'));
           final evaluator = const ExpressionEvaluator();
           final result = evaluator.eval(parsedExpression, {});
           display = result.toString();
-          history.add('$expression = $display'); // Add to history
-          expression = ''; // Clear the expression after evaluation
+          history.add('$expression = $display'); 
+          expression = ''; 
         } catch (e) {
           display = 'Error';
         }
       }
     } else if (buttonText == '⌫') {
-      // Handle backspace
       if (display.length > 1) {
         display = display.substring(0, display.length - 1);
       } else {
@@ -356,7 +346,6 @@ class _CalculatorState extends State<Calculator> {
       }
       expression = display;
     } else {
-      // Append the button text to the display and expression
       if (display == '0' && buttonText != '.') {
         display = buttonText;
       } else {
@@ -369,6 +358,8 @@ class _CalculatorState extends State<Calculator> {
     print('Updated Expression: $expression');
   });
 }
+
+
 
   void _rateUs() async {
     const url = 'https://play.google.com/store/apps/details?id=com.example.app'; // Update with your app's URL

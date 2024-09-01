@@ -12,12 +12,20 @@ class _MassConverterState extends State<MassConverter> {
   String _selectedToUnit = 'Grams';
 
   final List<String> _units = [
-    'Kilograms',
+    'Carats',
+    'Milligrams',
+    'Centigrams',
+    'Decigrams',
     'Grams',
-    'Pounds',
+    'Dekagrams',
+    'Hectograms',
+    'Kilograms',
+    'Metric Tons',
     'Ounces',
-    'Tons',
+    'Pounds',
     'Stones',
+    'Short Tons',
+    'Long Tons',
   ];
 
   void _convertMass() {
@@ -33,23 +41,47 @@ class _MassConverterState extends State<MassConverter> {
 
     // Convert to kilograms first
     switch (_selectedFromUnit) {
-      case 'Kilograms':
-        convertedValue = value;
+      case 'Carats':
+        convertedValue = value * 0.0002;
+        break;
+      case 'Milligrams':
+        convertedValue = value / 1e6;
+        break;
+      case 'Centigrams':
+        convertedValue = value / 100000;
+        break;
+      case 'Decigrams':
+        convertedValue = value / 10000;
         break;
       case 'Grams':
         convertedValue = value / 1000;
         break;
-      case 'Pounds':
-        convertedValue = value * 0.453592;
+      case 'Dekagrams':
+        convertedValue = value / 100;
+        break;
+      case 'Hectograms':
+        convertedValue = value / 10;
+        break;
+      case 'Kilograms':
+        convertedValue = value;
+        break;
+      case 'Metric Tons':
+        convertedValue = value * 1000;
         break;
       case 'Ounces':
-        convertedValue = value * 0.0283495;
+        convertedValue = value * 0.028349523125;
         break;
-      case 'Tons':
-        convertedValue = value * 907.185;
+      case 'Pounds':
+        convertedValue = value * 0.45359237;
         break;
       case 'Stones':
-        convertedValue = value * 6.35029;
+        convertedValue = value * 6.35029318;
+        break;
+      case 'Short Tons':
+        convertedValue = value * 907.18474;
+        break;
+      case 'Long Tons':
+        convertedValue = value * 1016.0469088;
         break;
       default:
         convertedValue = value; // Same unit
@@ -57,27 +89,51 @@ class _MassConverterState extends State<MassConverter> {
 
     // Convert from kilograms to the selected unit
     switch (_selectedToUnit) {
-      case 'Kilograms':
+      case 'Carats':
+        convertedValue /= 0.0002;
+        break;
+      case 'Milligrams':
+        convertedValue *= 1e6;
+        break;
+      case 'Centigrams':
+        convertedValue *= 100000;
+        break;
+      case 'Decigrams':
+        convertedValue *= 10000;
         break;
       case 'Grams':
         convertedValue *= 1000;
         break;
-      case 'Pounds':
-        convertedValue /= 0.453592;
+      case 'Dekagrams':
+        convertedValue *= 100;
+        break;
+      case 'Hectograms':
+        convertedValue *= 10;
+        break;
+      case 'Kilograms':
+        break;
+      case 'Metric Tons':
+        convertedValue /= 1000;
         break;
       case 'Ounces':
-        convertedValue /= 0.0283495;
+        convertedValue /= 0.028349523125;
         break;
-      case 'Tons':
-        convertedValue /= 907.185;
+      case 'Pounds':
+        convertedValue /= 0.45359237;
         break;
       case 'Stones':
-        convertedValue /= 6.35029;
+        convertedValue /= 6.35029318;
+        break;
+      case 'Short Tons':
+        convertedValue /= 907.18474;
+        break;
+      case 'Long Tons':
+        convertedValue /= 1016.0469088;
         break;
     }
 
     setState(() {
-      _convertedMass = convertedValue.toStringAsFixed(4);
+      _convertedMass = convertedValue.toStringAsFixed(10); // Scientific precision
     });
   }
 

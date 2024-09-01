@@ -18,7 +18,7 @@ class ConversionsSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Conversions"),
+        title: const Text("Conversions" , style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(

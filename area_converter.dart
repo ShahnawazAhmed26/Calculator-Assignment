@@ -12,12 +12,15 @@ class _AreaConverterState extends State<AreaConverter> {
   String _selectedToUnit = 'Square feet';
 
   final List<String> _units = [
+    'Square millimeters',
+    'Square centimeters',
     'Square meters',
+    'Square kilometers',
+    'Square inches',
     'Square feet',
     'Square yards',
     'Acres',
     'Hectares',
-    'Square kilometers',
     'Square miles',
   ];
 
@@ -34,8 +37,20 @@ class _AreaConverterState extends State<AreaConverter> {
 
     // Convert from the selected unit to square meters (base unit)
     switch (_selectedFromUnit) {
+      case 'Square millimeters':
+        convertedValue = value * 1e-6;
+        break;
+      case 'Square centimeters':
+        convertedValue = value * 1e-4;
+        break;
       case 'Square meters':
         convertedValue = value;
+        break;
+      case 'Square kilometers':
+        convertedValue = value * 1e6;
+        break;
+      case 'Square inches':
+        convertedValue = value * 0.00064516;
         break;
       case 'Square feet':
         convertedValue = value * 0.092903;
@@ -44,40 +59,46 @@ class _AreaConverterState extends State<AreaConverter> {
         convertedValue = value * 0.836127;
         break;
       case 'Acres':
-        convertedValue = value * 4046.86;
+        convertedValue = value * 4046.8564224;
         break;
       case 'Hectares':
         convertedValue = value * 10000;
         break;
-      case 'Square kilometers':
-        convertedValue = value * 1e6;
-        break;
       case 'Square miles':
-        convertedValue = value * 2.59e6;
+        convertedValue = value * 2.589988110336e6;
         break;
     }
 
     // Convert from square meters (base unit) to the selected target unit
     switch (_selectedToUnit) {
+      case 'Square millimeters':
+        convertedValue *= 1e6;
+        break;
+      case 'Square centimeters':
+        convertedValue *= 1e4;
+        break;
       case 'Square meters':
         break;
+      case 'Square kilometers':
+        convertedValue *= 1e-6;
+        break;
+      case 'Square inches':
+        convertedValue /= 0.00064516;
+        break;
       case 'Square feet':
-        convertedValue *= 10.764;
+        convertedValue /= 0.092903;
         break;
       case 'Square yards':
-        convertedValue *= 1.19599;
+        convertedValue /= 0.836127;
         break;
       case 'Acres':
-        convertedValue /= 4046.86;
+        convertedValue /= 4046.8564224;
         break;
       case 'Hectares':
         convertedValue /= 10000;
         break;
-      case 'Square kilometers':
-        convertedValue /= 1e6;
-        break;
       case 'Square miles':
-        convertedValue /= 2.59e6;
+        convertedValue /= 2.589988110336e6;
         break;
     }
 
@@ -88,36 +109,39 @@ class _AreaConverterState extends State<AreaConverter> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Area Converter" , style: TextStyle(color: Colors.white),),
+        title: const Text("Area Converter", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildTitle('Enter area:'),
-            SizedBox(height: 10),
+            SizedBox(height: screenHeight * 0.02),
             _buildInputField(),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             _buildCustomDropdown('From:', _selectedFromUnit, (value) {
               setState(() {
                 _selectedFromUnit = value!;
               });
             }),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             _buildCustomDropdown('To:', _selectedToUnit, (value) {
               setState(() {
                 _selectedToUnit = value!;
               });
             }),
-            SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.03),
             _buildConvertButton(),
-            SizedBox(height: 20),
-            _buildResultText(),
+            SizedBox(height: screenHeight * 0.03),
+            _buildResultCard(),
           ],
         ),
       ),
@@ -127,22 +151,30 @@ class _AreaConverterState extends State<AreaConverter> {
   Widget _buildTitle(String text) {
     return Text(
       text,
-      style: TextStyle(fontSize: 20, color: Colors.white),
+      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05, color: Colors.white),
     );
   }
 
   Widget _buildInputField() {
-    return TextField(
-      controller: _controller,
-      keyboardType: TextInputType.number,
-      style: TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: 'Area',
-        hintStyle: TextStyle(color: Colors.grey),
-        filled: true,
-        fillColor: Colors.grey[850],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: Colors.grey[850],
+      child: Padding(
+        padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+        child: TextField(
+          controller: _controller,
+          keyboardType: TextInputType.number,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Enter value',
+            hintStyle: TextStyle(color: Colors.grey),
+            border: InputBorder.none,
+            filled: true,
+            fillColor: Colors.grey[800],
+          ),
         ),
       ),
     );
@@ -153,36 +185,33 @@ class _AreaConverterState extends State<AreaConverter> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTitle(label),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[850],
+        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+        Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
           ),
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: DropdownButton<String>(
-            value: value,
-            onChanged: onChanged,
-            isExpanded: true,
-            icon: Icon(Icons.arrow_drop_down, color: Colors.yellow),
-            dropdownColor: Colors.grey[900],
-            underline: SizedBox(),
-            style: TextStyle(color: Colors.white, fontSize: 16),
-            items: _units.map((unit) {
-              return DropdownMenuItem(
-                value: unit,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(unit),
-                ),
-              );
-            }).toList(),
+          color: Colors.grey[850],
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04, vertical: MediaQuery.of(context).size.height * 0.01),
+            child: DropdownButton<String>(
+              value: value,
+              onChanged: onChanged,
+              isExpanded: true,
+              icon: Icon(Icons.arrow_drop_down, color: Colors.yellow),
+              dropdownColor: Colors.grey[900],
+              underline: SizedBox(),
+              style: TextStyle(color: Colors.white, fontSize: MediaQuery.of(context).size.width * 0.04),
+              items: _units.map((unit) {
+                return DropdownMenuItem(
+                  value: unit,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(unit),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ],
@@ -195,8 +224,8 @@ class _AreaConverterState extends State<AreaConverter> {
       child: Text('Convert'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.yellow,
-        padding: EdgeInsets.symmetric(vertical: 20),
-        textStyle: TextStyle(fontSize: 20),
+        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
+        textStyle: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
         minimumSize: Size(double.infinity, 60),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -205,10 +234,23 @@ class _AreaConverterState extends State<AreaConverter> {
     );
   }
 
-  Widget _buildResultText() {
-    return Text(
-      'Converted Area: $_convertedArea $_selectedToUnit',
-      style: TextStyle(fontSize: 18, color: Colors.white),
+  Widget _buildResultCard() {
+    return Center(
+      child: Card(
+        color: Colors.grey[850],
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+          child: Text(
+            'Converted Area: $_convertedArea $_selectedToUnit',
+            style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 }

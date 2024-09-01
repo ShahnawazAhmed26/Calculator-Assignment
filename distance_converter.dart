@@ -92,14 +92,14 @@ class _DistanceConverterState extends State<DistanceConverter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Distance Converter"),
+        title: const Text("Distance Converter", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildTitle('Enter distance:'),
             SizedBox(height: 10),
@@ -177,7 +177,7 @@ class _DistanceConverterState extends State<DistanceConverter> {
             underline: SizedBox(),
             style: TextStyle(color: Colors.white, fontSize: 16),
             items: _units.map((unit) {
-              return DropdownMenuItem(
+              return DropdownMenuItem<String>(
                 value: unit,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -211,6 +211,7 @@ class _DistanceConverterState extends State<DistanceConverter> {
     return Text(
       'Converted Distance: $_convertedDistance $_selectedToUnit',
       style: TextStyle(fontSize: 18, color: Colors.white),
+      textAlign: TextAlign.center,
     );
   }
 }

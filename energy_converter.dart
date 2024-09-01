@@ -32,7 +32,7 @@ class _EnergyConverterState extends State<EnergyConverter> {
     double convertedValue = (_inputValue * fromRate) / toRate;
 
     setState(() {
-      _result = 'Converted value: $convertedValue $_toUnit';
+      _result = 'Converted value: ${convertedValue.toStringAsFixed(4)} $_toUnit'; // Adjusted for precision
     });
   }
 
@@ -110,7 +110,7 @@ class _EnergyConverterState extends State<EnergyConverter> {
             underline: SizedBox(),
             style: TextStyle(color: Colors.white, fontSize: 16),
             items: _conversionRates.keys.map((unit) {
-              return DropdownMenuItem(
+              return DropdownMenuItem<String>(
                 value: unit,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
