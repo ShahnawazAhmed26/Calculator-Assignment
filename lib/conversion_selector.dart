@@ -94,15 +94,13 @@ class ConversionsSelector extends StatelessWidget {
         const SizedBox(width: 20),
         GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => ConversionsSelector()),
-            );
+            
+            
           },
           child: Text(
             'Converter',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.yellow,
               fontSize: 18,
                fontWeight: FontWeight.bold,
             ),

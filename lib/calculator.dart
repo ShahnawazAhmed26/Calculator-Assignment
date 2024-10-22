@@ -10,17 +10,20 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  static const Color backgroundColor = Colors.black;
-  static const Color buttonColor = Color(0xFF1E1E1E);
-  static const Color operatorColor = Colors.orange;
+  static const Color backgroundColor = Colors.black87; // Darker background for better contrast
+  static const Color buttonColor = Color(0xFF424242); // Darker gray for numeric buttons
+  static const Color operatorColor = Color(0xFFFFC107); // Vibrant yellow for operators
+  static const Color actionColor = Color(0xFFFFC107); // Blue for actions like AC and backspace
   static const Color textColor = Colors.white;
+
+
 
   String display = '0';
   String expression = '';
-  List<String> history = [];
+  String evaluatedResult = '';
 
   final List<String> _buttonLabels = [
-    'AC', '', '%', '⌫',
+    'AC', '+/-', '%', '⌫',
     '7', '8', '9', '÷',
     '4', '5', '6', '×',
     '1', '2', '3', '-',
@@ -34,7 +37,10 @@ class _CalculatorState extends State<Calculator> {
       appBar: _buildAppBar(context),
       body: Column(
         children: <Widget>[
-          _buildDisplay(),
+          Expanded(
+            child: _buildDisplay(),
+          ),
+          const SizedBox(height: 10),
           _buildButtonGrid(),
         ],
       ),
@@ -54,7 +60,7 @@ class _CalculatorState extends State<Calculator> {
             child: Text(
               'Calculator',
               style: TextStyle(
-                color: textColor,
+                color: Colors.yellow,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -83,57 +89,109 @@ class _CalculatorState extends State<Calculator> {
   }
 
   Container _buildDisplay() {
+    evaluatedResult = _evaluateExpression(expression);
+
     return Container(
       alignment: Alignment.centerRight,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-      child: Text(
-        display,
-        style: TextStyle(color: textColor, fontSize: 72),
-        textAlign: TextAlign.right,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: 200,
+                ),
+                child: SingleChildScrollView(
+                  reverse: true,
+                  child: Text(
+                    display,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 50,
+                    ),
+                    textAlign: TextAlign.right,
+                    maxLines: 2,
+                  ),
+                ),
+              );
+            },
+          ),
+          Container(
+            constraints: BoxConstraints(maxHeight: 40),
+            child: Text(
+              evaluatedResult.isNotEmpty ? evaluatedResult : '',
+              style: TextStyle(
+                color: textColor.withOpacity(0.7),
+                fontSize: 36,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Expanded _buildButtonGrid() {
-    return Expanded(
-      child: GridView.builder(
-        padding: const EdgeInsets.all(12),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 1.0,
-        ),
-        itemCount: _buttonLabels.length,
-        itemBuilder: (context, index) {
-          final button = _buttonLabels[index];
+ Widget _buildButtonGrid() {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 15),
+    child: GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(8),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 1.1,
+      ),
+      itemCount: _buttonLabels.length,
+      itemBuilder: (context, index) {
+        final button = _buttonLabels[index];
 
-          if (button.isEmpty) {
-            return const SizedBox.shrink();
-          }
+        if (button.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-          return GestureDetector(
-            onTap: () => calculation(button),
-            child: Container(
-              decoration: BoxDecoration(
-                color: button == 'AC' || ['%', '⌫'].contains(button) ? operatorColor : buttonColor,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Center(
-                child: Text(
-                  button,
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: textColor,
-                  ),
+        final isOperator = ['+', '-', '×', '÷', '=', '%' , '+/-'].contains(button);
+        final isAction = ['AC', '⌫'].contains(button);
+
+        return GestureDetector(
+          onTap: () => calculation(button),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.15,
+            height: MediaQuery.of(context).size.width * 0.15,
+            decoration: BoxDecoration(
+              color: isOperator ? operatorColor : (isAction ? actionColor : buttonColor),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                button,
+                style: TextStyle(
+                  fontSize: 28,
+                  color: textColor,
+                  fontWeight: isOperator || isAction
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                 ),
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
 
   void calculation(String buttonText) {
     setState(() {
@@ -157,12 +215,16 @@ class _CalculatorState extends State<Calculator> {
           expression = '';
           break;
         case '⌫':
-          display = display.length > 1 ? display.substring(0, display.length - 1) : '0';
+          display = display.length > 1
+              ? display.substring(0, display.length - 1)
+              : '0';
           expression = display;
           break;
         case '+/-':
           if (display != '0') {
-            display = display.startsWith('-') ? display.substring(1) : '-' + display;
+            display = display.startsWith('-')
+                ? display.substring(1)
+                : '-' + display;
           }
           break;
         case '%':
@@ -171,7 +233,7 @@ class _CalculatorState extends State<Calculator> {
           }
           break;
         case '=':
-          _evaluateExpression();
+          _evaluateExpression(expression);
           break;
         default:
           if (display == '0' && buttonText != '.') {
@@ -180,25 +242,23 @@ class _CalculatorState extends State<Calculator> {
             display += buttonText;
           }
           expression += buttonText;
+          break;
       }
     });
   }
 
-  void _evaluateExpression() {
-    if (expression.isNotEmpty) {
-      try {
-        final parsedExpression = Expression.parse(expression
-            .replaceAll('×', '*')
-            .replaceAll('÷', '/'));
-        final evaluator = const ExpressionEvaluator();
-        final result = evaluator.eval(parsedExpression, {});
-        display = result.toString();
-        history.add('$expression = $display');
-        expression = '';
-      } catch (e) {
-        display = 'Error';
-        expression = '';
-      }
+  String _evaluateExpression(String exp) {
+    if (exp.isEmpty) return '';
+    
+    try {
+      final parsedExpression = Expression.parse(
+        exp.replaceAll('×', '*').replaceAll('÷', '/')
+      );
+      final evaluator = const ExpressionEvaluator();
+      final result = evaluator.eval(parsedExpression, {});
+      return result.toString();
+    } catch (e) {
+      return '';
     }
   }
 }
