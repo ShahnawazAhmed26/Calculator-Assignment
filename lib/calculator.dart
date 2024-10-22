@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'conversion_selector.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expressions/expressions.dart';
+import 'conversion_selector.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({super.key});
@@ -14,16 +12,15 @@ class Calculator extends StatefulWidget {
 class _CalculatorState extends State<Calculator> {
   static const Color backgroundColor = Colors.black;
   static const Color buttonColor = Color(0xFF1E1E1E);
-  static const Color operatorColor = Colors.yellow;
+  static const Color operatorColor = Colors.orange;
   static const Color textColor = Colors.white;
 
-  String display = 'WELCOME !';
+  String display = '0';
   String expression = '';
   List<String> history = [];
-  bool isWelcomeDisplayed = true;
 
   final List<String> _buttonLabels = [
-    'AC', '+/-', '%', '⌫',
+    'AC', '', '%', '⌫',
     '7', '8', '9', '÷',
     '4', '5', '6', '×',
     '1', '2', '3', '-',
@@ -32,17 +29,13 @@ class _CalculatorState extends State<Calculator> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final buttonSize = screenSize.width / 4;
-
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: _buildAppBar(context),
-      drawer: _buildDrawer(context),
       body: Column(
         children: <Widget>[
           _buildDisplay(),
-          _buildButtonGrid(buttonSize),
+          _buildButtonGrid(),
         ],
       ),
     );
@@ -51,61 +44,38 @@ class _CalculatorState extends State<Calculator> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: backgroundColor,
-      title: const Text(
-        "Pentaculator",
-        style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
-      ),
-      leading: Builder(
-        builder: (context) {
-          return IconButton(
-            icon: Image.asset('assets/s.png', width: 24, height: 24),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          );
-        },
-      ),
-      actions: [
-        IconButton(
-          key: ValueKey('history'),
-          icon: Image.asset('assets/h.png', width: 24, height: 24),
-          onPressed: showHistory,
-        ),
-        IconButton(
-          icon: Image.asset('assets/c.png', width: 24, height: 24),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ConversionsSelector()),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Drawer _buildDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.grey[900],
-      child: Column(
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          DrawerHeader(
-            decoration: BoxDecoration(color: backgroundColor),
-            child: Center(
-              child: Text(
-                "Working On ...",
-                style: TextStyle(color: textColor, fontSize: 24, fontWeight: FontWeight.bold),
+          GestureDetector(
+            onTap: () {},
+            child: Text(
+              'Calculator',
+              style: TextStyle(
+                color: textColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          ListTile(
-            title: const Text("Standard", style: TextStyle(color: textColor, fontSize: 18)),
-            onTap: () => Navigator.pop(context),
-          ),
-          ListTile(
-            leading: Icon(Icons.star, color: Colors.yellow),
-            title: Text("Rate Us", style: TextStyle(color: textColor, fontSize: 18)),
-            onTap: _rateUs,
+          const SizedBox(width: 20),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ConversionsSelector()),
+              );
+            },
+            child: Text(
+              'Converter',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
           ),
         ],
       ),
@@ -115,42 +85,47 @@ class _CalculatorState extends State<Calculator> {
   Container _buildDisplay() {
     return Container(
       alignment: Alignment.centerRight,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
       child: Text(
         display,
-        style: TextStyle(color: textColor, fontSize: _getFontSize(display)),
+        style: TextStyle(color: textColor, fontSize: 72),
         textAlign: TextAlign.right,
       ),
     );
   }
 
-  Expanded _buildButtonGrid(double buttonSize) {
+  Expanded _buildButtonGrid() {
     return Expanded(
       child: GridView.builder(
+        padding: const EdgeInsets.all(12),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
           childAspectRatio: 1.0,
         ),
         itemCount: _buttonLabels.length,
         itemBuilder: (context, index) {
           final button = _buttonLabels[index];
-          final isOperator = ['÷', '×', '-', '+', '=', '⌫'].contains(button);
-          return SizedBox(
-            width: buttonSize,
-            height: buttonSize,
-            child: ElevatedButton(
-              onPressed: () => calculation(button),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isOperator ? operatorColor : buttonColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: EdgeInsets.all(0),
+
+          if (button.isEmpty) {
+            return const SizedBox.shrink();
+          }
+
+          return GestureDetector(
+            onTap: () => calculation(button),
+            child: Container(
+              decoration: BoxDecoration(
+                color: button == 'AC' || ['%', '⌫'].contains(button) ? operatorColor : buttonColor,
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
                 child: Text(
                   button,
-                  style: TextStyle(fontSize: 20, color: isOperator ? Colors.black : textColor),
+                  style: TextStyle(
+                    fontSize: 28,
+                    color: textColor,
+                  ),
                 ),
               ),
             ),
@@ -160,19 +135,8 @@ class _CalculatorState extends State<Calculator> {
     );
   }
 
-  double _getFontSize(String text) {
-    if (text.length > 15) return 40;
-    if (text.length > 10) return 50;
-    return 60;
-  }
-
   void calculation(String buttonText) {
     setState(() {
-      if (isWelcomeDisplayed) {
-        display = ''; // Clear welcome message
-        isWelcomeDisplayed = false; // Update the flag
-      }
-
       if (display == 'Error') {
         if (buttonText == '⌫') {
           display = '0';
@@ -229,115 +193,12 @@ class _CalculatorState extends State<Calculator> {
         final evaluator = const ExpressionEvaluator();
         final result = evaluator.eval(parsedExpression, {});
         display = result.toString();
-        history.add('$expression = $display'); // Save to history
+        history.add('$expression = $display');
         expression = '';
       } catch (e) {
         display = 'Error';
         expression = '';
       }
-    }
-  }
-
-  void showHistory() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          height: MediaQuery.of(context).size.height * 0.5,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: _buildHistoryList(),
-        );
-      },
-    );
-  }
-
-  Widget _buildHistoryList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: Text(
-              'History',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: textColor),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: history.length,
-            itemBuilder: (context, index) {
-              return Card(
-                color: Colors.grey[800],
-                margin: EdgeInsets.symmetric(vertical: 5),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(12),
-                  title: Text(
-                    history[index],
-                    style: TextStyle(color: textColor, fontSize: 16),
-                  ),
-                  trailing: Icon(Icons.history, color: operatorColor),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      final parts = history[index].split(' = ');
-                      if (parts.length == 2) {
-                        display = parts[1];
-                        expression = parts[1].replaceAll('×', '*').replaceAll('÷', '/');
-                      }
-                    });
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-        _buildHistoryActions(),
-      ],
-    );
-  }
-
-  Widget _buildHistoryActions() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (history.isNotEmpty)
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              onPressed: () {
-                setState(() {
-                  history.clear();
-                });
-                Navigator.of(context).pop();
-              },
-              child: Text('Clear All History', style: TextStyle(color: Colors.white, fontSize: 16)),
-            ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: operatorColor),
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Close', style: TextStyle(color: Colors.black, fontSize: 16)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _rateUs() async {
-    const url = 'https://play.google.com/store/apps/details?id=com.example.app'; // Update with your app's URL
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
     }
   }
 }
