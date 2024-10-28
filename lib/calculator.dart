@@ -10,17 +10,16 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  static const Color backgroundColor = Colors.black87; // Darker background for better contrast
-  static const Color buttonColor = Color(0xFF424242); // Darker gray for numeric buttons
-  static const Color operatorColor = Color(0xFFFFC107); // Vibrant yellow for operators
-  static const Color actionColor = Color(0xFFFFC107); // Blue for actions like AC and backspace
+  static const Color backgroundColor = Colors.black87;
+  static const Color buttonColor = Color(0xFF424242);
+  static const Color operatorColor = Color(0xFFFFC107);
+  static const Color actionColor = Color(0xFFFFC107);
   static const Color textColor = Colors.white;
 
-
-
-  String display = '0';
+  String display = 'Welcome!';
   String expression = '';
   String evaluatedResult = '';
+  bool isInitialScreen = true;
 
   final List<String> _buttonLabels = [
     'AC', '+/-', '%', '⌫',
@@ -92,127 +91,100 @@ class _CalculatorState extends State<Calculator> {
     evaluatedResult = _evaluateExpression(expression);
 
     return Container(
-      alignment: Alignment.centerRight,
+      alignment: isInitialScreen ? Alignment.center : Alignment.centerRight,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: isInitialScreen ? MainAxisAlignment.center : MainAxisAlignment.end,
         children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: 200,
-                ),
-                child: SingleChildScrollView(
-                  reverse: true,
-                  child: Text(
-                    display,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 50,
-                    ),
-                    textAlign: TextAlign.right,
-                    maxLines: 2,
-                  ),
-                ),
-              );
-            },
+          Text(
+            display,
+            style: TextStyle(
+              color: textColor,
+              fontSize: isInitialScreen ? 60 : 50,
+            ),
+            textAlign: isInitialScreen ? TextAlign.center : TextAlign.right,
           ),
-          Container(
-            constraints: BoxConstraints(maxHeight: 40),
-            child: Text(
-              evaluatedResult.isNotEmpty ? evaluatedResult : '',
+          if (!isInitialScreen && evaluatedResult.isNotEmpty)
+            Text(
+              evaluatedResult,
               style: TextStyle(
                 color: textColor.withOpacity(0.7),
                 fontSize: 36,
               ),
               textAlign: TextAlign.right,
             ),
-          ),
         ],
       ),
     );
   }
 
- Widget _buildButtonGrid() {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 15),
-    child: GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(8),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1.1,
-      ),
-      itemCount: _buttonLabels.length,
-      itemBuilder: (context, index) {
-        final button = _buttonLabels[index];
+  Widget _buildButtonGrid() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(8),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 1.1,
+        ),
+        itemCount: _buttonLabels.length,
+        itemBuilder: (context, index) {
+          final button = _buttonLabels[index];
+          final isOperator = ['+', '-', '×', '÷', '=', '%', '+/-'].contains(button);
+          final isAction = ['AC', '⌫'].contains(button);
 
-        if (button.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        final isOperator = ['+', '-', '×', '÷', '=', '%' , '+/-'].contains(button);
-        final isAction = ['AC', '⌫'].contains(button);
-
-        return GestureDetector(
-          onTap: () => calculation(button),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.15,
-            height: MediaQuery.of(context).size.width * 0.15,
-            decoration: BoxDecoration(
-              color: isOperator ? operatorColor : (isAction ? actionColor : buttonColor),
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4,
-                  offset: Offset(2, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                button,
-                style: TextStyle(
-                  fontSize: 28,
-                  color: textColor,
-                  fontWeight: isOperator || isAction
-                      ? FontWeight.bold
-                      : FontWeight.normal,
+          return GestureDetector(
+            onTap: () => calculation(button),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.15,
+              height: MediaQuery.of(context).size.width * 0.15,
+              decoration: BoxDecoration(
+                color: isOperator ? operatorColor : (isAction ? actionColor : buttonColor),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  button,
+                  style: TextStyle(
+                    fontSize: 28,
+                    color: textColor,
+                    fontWeight: isOperator || isAction
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
 
   void calculation(String buttonText) {
     setState(() {
-      if (display == 'Error') {
-        if (buttonText == '⌫') {
-          display = '0';
-          expression = '';
-        } else if (buttonText != 'AC') {
-          display = buttonText;
-          expression = buttonText;
-        } else {
-          display = '0';
-          expression = '';
-        }
-        return;
+      if (display == 'Welcome!') {
+        display = '';
+        isInitialScreen = false;
       }
 
       switch (buttonText) {
         case 'AC':
           display = '0';
           expression = '';
+          isInitialScreen = true;
           break;
         case '⌫':
           display = display.length > 1
