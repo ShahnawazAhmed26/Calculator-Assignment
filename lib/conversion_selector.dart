@@ -1,198 +1,144 @@
-
-import 'package:Omniculator/calculator.dart';
+import 'package:chrono_calc/angle_converter.dart';
+import 'package:chrono_calc/bmi_converter.dart';
+import 'package:chrono_calc/data_converter.dart';
+import 'package:chrono_calc/discount_calculator.dart';
+import 'package:chrono_calc/distance_converter.dart';
 import 'package:flutter/material.dart';
-import 'speed_converter.dart';
-import 'time_converter.dart';
-import 'distance_converter.dart';
-import 'temperature_converter.dart';
-import 'volume_converter.dart';
-import 'mass_converter.dart';
-import 'area_converter.dart';
-import 'currency_converter.dart';
-import 'energy_converter.dart';
-import 'power_converter.dart';
-import 'data_converter.dart';
-import 'pressure_converter.dart';
-import 'angle_converter.dart';
-import 'bmi_converter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-class ConversionsSelector extends StatelessWidget {
-  static const Color backgroundColor = Colors.black; 
-  static const Color textColor = Colors.white; 
+// Import your converter screens
+import 'finance_converter.dart';
+import 'mass_converter.dart';
+import 'numeral_system_converter.dart';
+import 'power_converter.dart';
+import 'pressure_converter.dart';
+import 'speed_converter.dart';
+import 'temperature_converter.dart';
+import 'area_converter.dart';
+import 'volume_converter.dart';
+import 'energy_converter.dart';
+import 'time_converter.dart';
+
+class ConverterSelectionScreen extends StatelessWidget {
+  const ConverterSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final converters = [
-      {'title': 'Angle ', 'widget': AngleConverter()},
-      {'title': 'Area ', 'widget': AreaConverter()},
-      {'title': 'Currency ', 'widget': CurrencyConverter()},
-      {'title': 'Data ', 'widget': DataConverter()},
-      {'title': 'Distance ', 'widget': DistanceConverter()},
-      {'title': 'Energy ', 'widget': EnergyConverter()},
-      {'title': 'Mass ', 'widget': MassConverter()},
-      {'title': 'Power ', 'widget': PowerConverter()},
-      {'title': 'Pressure ', 'widget': PressureConverter()},
-      {'title': 'Speed ', 'widget': SpeedConverter()},
-      {'title': 'Temperature ', 'widget': TemperatureConverter()},
-      {'title': 'Volume ', 'widget': VolumeConverter()},
-      {'title': 'Time ', 'widget': TimeConverter()},
-      {'title': 'BMI ', 'widget': BMICalculator()},
+    final accentColor = const Color(0xFFFFD600); // Bright yellow
+
+    final List<Map<String, dynamic>> converters = [
+      {"name": "Area", "icon": Icons.crop_square, "page":  AreaConverter()},
+      {"name": "Angle", "icon": Icons.crop_square, "page":  AngleConverter()},
+      {"name": "Data", "icon": Icons.crop_square, "page":  DataConverter()},
+      {"name": "Discount", "icon": Icons.crop_square, "page":  DiscountCalculator()},
+      {"name": "Distance", "icon": Icons.crop_square, "page":  DistanceConverter()},
+      {"name": "Energy", "icon": Icons.crop_square, "page":  EnergyConverter()},
+      {"name": "Finance", "icon": Icons.crop_square, "page":  FinanceConverter()},
+
+      {"name": "BMI", "icon": Icons.crop_square, "page":  BMICalculator()},
+
+      {"name": "Volume", "icon": Icons.invert_colors, "page":  VolumeConverter()},
+      {"name": "Mass", "icon": Icons.scale, "page":  MassConverter()},
+      {"name": "Temperature", "icon": Icons.thermostat, "page":  TemperatureConverter()},
+      {"name": "Speed", "icon": Icons.speed, "page":  SpeedConverter()},
+      {"name": "Power", "icon": Icons.flash_on, "page": PowerConverter() },
+      {"name": "Pressure", "icon": Icons.compress, "page":  PressureConverter()},
+      {"name": "Energy", "icon": Icons.bolt, "page":  EnergyConverter()},
+      {"name": "Time", "icon": Icons.access_time, "page":  TimeConverter()},
+      {"name": "Numeral System", "icon": Icons.code, "page":  NumeralSystemConverter()},
+      {"name": "Finance", "icon": Icons.attach_money, "page":  FinanceConverter()},
     ];
 
-    converters.sort((a, b) => (a['title'] as String).compareTo(b['title'] as String));
-
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      backgroundColor: backgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: converters.map((converter) {
-            return _buildConversionTile(
-              title: converter['title'] as String,
-              icon: _getIconForConverter(converter['title'] as String),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  _createRoute(converter['widget'] as Widget),
-                );
-              },
-            );
-          }).toList(),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.black, Color(0xFF222222)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
-    );
-  }
-
- AppBar _buildAppBar(BuildContext context) {
-  return AppBar(
-    backgroundColor: backgroundColor,
-    elevation: 0,
-    automaticallyImplyLeading: false, // This removes the back arrow
-    title: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => Calculator()),
-            );
-          },
-          child: Text(
-            'Calculator',
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(
+            "Converters",
             style: TextStyle(
-              color: Colors.grey,
-              fontSize: 18,
-             
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: accentColor,
+              letterSpacing: 1.5,
             ),
           ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
-        const SizedBox(width: 20),
-        GestureDetector(
-          onTap: () {
-            
-            
-          },
-          child: Text(
-            'Converter',
-            style: TextStyle(
-              color: Colors.yellow,
-              fontSize: 18,
-               fontWeight: FontWeight.bold,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GridView.builder(
+            itemCount: converters.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 22,
+              crossAxisSpacing: 22,
+              childAspectRatio: 1.1,
             ),
+            itemBuilder: (context, index) {
+              final converter = converters[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => converter["page"]));
+                },
+                child: AnimatedContainer(
+                  duration: 300.ms,
+                  curve: Curves.easeInOut,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.07),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withOpacity(0.12),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    border: Border.all(color: accentColor.withOpacity(0.25), width: 2),
+                    // Glassmorphism effect
+                    backgroundBlendMode: BlendMode.overlay,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: accentColor.withOpacity(0.25),
+                              blurRadius: 18,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Icon(converter["icon"], size: 44, color: accentColor),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        converter["name"],
+                        style: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.7,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              );
+            },
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-  Route _createRoute(Widget targetScreen) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => targetScreen,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = Curves.ease;
-
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
-
-  IconData _getIconForConverter(String title) {
-    switch (title) {
-      case 'Angle ':
-        return Icons.rotate_left;
-      case 'Area ':
-        return Icons.crop_square;
-      case 'Currency ':
-        return Icons.currency_exchange;
-      case 'Data ':
-        return Icons.data_object;
-      case 'Distance ':
-        return Icons.straighten;
-      case 'Energy ':
-        return Icons.bolt;
-      case 'Mass ':
-        return Icons.scale;
-      case 'Power ':
-        return Icons.electric_bolt;
-      case 'Pressure ':
-        return Icons.compress;
-      case 'Speed ':
-        return Icons.speed;
-      case 'Temperature ':
-        return Icons.device_thermostat;
-      case 'Volume ':
-        return Icons.local_drink;
-      case 'Time ':
-        return Icons.access_time;
-      case 'BMI ':
-        return Icons.monitor_weight;
-      default:
-        return Icons.help;
-    }
-  }
-
-  Widget _buildConversionTile({required String title, required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.grey[900],
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 50, color: Colors.white),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18, color: Colors.white),
-            ),
-          ],
         ),
       ),
     );
